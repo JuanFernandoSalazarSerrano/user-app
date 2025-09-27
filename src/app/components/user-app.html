@@ -1,0 +1,28 @@
+<!-- Minimal User List (Tailwind) — uses @if and @for (no deprecated directives) -->
+<div class="max-w-5xl mx-auto mt-8 p-6 bg-white rounded-xl shadow">
+  <header class="flex items-center justify-between mb-6">
+    <h2 class="text-xl font-semibold text-slate-800">Users</h2>
+    <p class="text-sm text-slate-500">Showing {{ (users).length }} users</p>
+  </header>
+
+  <user-form
+    (newUserEventEmitter)="addUser($event)"
+  ></user-form>
+
+    @if ((users ?? []).length === 0) {
+    <div class="py-10 text-center text-slate-500">
+      No users to display.
+    </div>
+  }
+
+  @if ((users ?? []).length > 0) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for (user of (users ?? []); track $index) {
+        <user-component
+          [user]="user"
+          (EventEmitterDelete)="onDeleteUser($event)"
+        ></user-component>
+      }
+    </div>
+  }
+</div>
