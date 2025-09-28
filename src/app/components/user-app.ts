@@ -31,6 +31,8 @@ export class UserApp implements OnInit {
 
   addUser(user: User): void{
 
+    console.log(user)
+
     this.editingUser = false
 
     this.users = this.users.map(u => u.id === user.id ? { ...u, ...user } : u);
@@ -56,8 +58,8 @@ export class UserApp implements OnInit {
 
   }
 
-  onDeleteUser(user1: User): void{
-    this.users = this.users.filter(user => user !== user1)
+  onDeleteUser(userToDelete: User): void{
+    this.users = this.users.filter(user => user !== userToDelete)
   }
 
 
@@ -69,7 +71,7 @@ export class UserApp implements OnInit {
 
   onUpdateUser(user: User): void{
 
-    this.userToUpdate =  user
+    this.userToUpdate = {...user}
 
   }
 }
