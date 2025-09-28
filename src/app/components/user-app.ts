@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../services/userService';
 import { User } from '../models/User';
-import { UserComponent } from './user/UserComponent';
-import { UserForm } from './user-form/user-form';
+import { RouterOutlet } from '@angular/router';
+import { Navbar } from './navbar/navbar';
 
 @Component({
   selector: 'user-app',
-  imports: [UserComponent, UserForm],
+  imports: [RouterOutlet, Navbar],
   templateUrl: './user-app.html'})
 
 export class UserApp implements OnInit {

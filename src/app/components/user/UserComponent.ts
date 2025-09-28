@@ -1,9 +1,10 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { User } from '../../models/User';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'user-component',
-  imports: [],
+  imports: [RouterModule],
   templateUrl: './UserComponent.html'
 })
 export class UserComponent {
@@ -42,7 +43,7 @@ export class UserComponent {
     confirmRemove.then(() => this.EventEmitterDelete.emit(this.user))
   }
 
-  onEditUser(): void{
+  onAddUser(): void{
 
     // this.editingUser = this.editingUser ? false : true
 
