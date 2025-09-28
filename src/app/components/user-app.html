@@ -5,7 +5,9 @@
     <p class="text-sm text-slate-500">Showing {{ (users).length }} users</p>
   </header>
 
-  <user-form
+    <user-form
+    [user]="userToUpdate"
+    [editingUser]="editingUser"
     (newUserEventEmitter)="addUser($event)"
   ></user-form>
 
@@ -17,10 +19,12 @@
 
   @if ((users ?? []).length > 0) {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      @for (user of (users ?? []); track $index) {
+      @for (user of users; track $index) {
         <user-component
           [user]="user"
           (EventEmitterDelete)="onDeleteUser($event)"
+          (EventEmitterEdit)="onEditUser()"
+          (EventEmitterUpdate)="onUpdateUser($event)"
         ></user-component>
       }
     </div>

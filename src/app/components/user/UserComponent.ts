@@ -10,13 +10,20 @@ export class UserComponent {
 
   @Input() user!: User;
 
+  editingUser: boolean = false;
+
   @Output() EventEmitterDelete: EventEmitter<User> = new EventEmitter();
+
+  @Output() EventEmitterEdit: EventEmitter<boolean> = new EventEmitter();
+
+  @Output() EventEmitterUpdate: EventEmitter<User> = new EventEmitter();
+
 
   onDeleteUser(): void{
 
     /// i could just use an if but i wanted to remember promises
 
-    /// to do add sweetalert or somehting better
+    /// TODO add sweetalert or somehting better
 
     const deleteUser = confirm('Do you want to delete the user?')
 
@@ -33,5 +40,17 @@ export class UserComponent {
     })
 
     confirmRemove.then(() => this.EventEmitterDelete.emit(this.user))
+  }
+
+  onEditUser(): void{
+
+    // this.editingUser = this.editingUser ? false : true
+
+    this.editingUser = !this.editingUser // lol
+    this.EventEmitterEdit.emit(this.editingUser)
+
+
+    this.EventEmitterUpdate.emit(this.user)
+
   }
 }
