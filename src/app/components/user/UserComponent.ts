@@ -1,6 +1,8 @@
+import { SharingData } from './../../services/sharing-data';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { User } from '../../models/User';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { UserService } from '../../services/userService';
 
 @Component({
   selector: 'user-component',
@@ -9,18 +11,33 @@ import { RouterModule } from '@angular/router';
 })
 export class UserComponent {
 
-  @Input() user!: User;
+  user: User;
+
+  users: User[] = []
 
   editingUser: boolean = false;
 
-  @Output() EventEmitterDelete: EventEmitter<User> = new EventEmitter();
+  constructor(private router: Router, private service: UserService, private readonly SharingData: SharingData){
 
-  @Output() EventEmitterEdit: EventEmitter<boolean> = new EventEmitter();
+    this.user = {
+      id: 0,
+      name: 'NYA',
+      lastname: '',
+      email: '',
+      username: '',
+      password: ''
+    };
 
-  @Output() EventEmitterUpdate: EventEmitter<User> = new EventEmitter();
+    if(this.router.currentNavigation()?.extras.state){
+      this.users = this.router.currentNavigation()?.extras.state!['users']
+    }
 
+    else {
+      this.service.findAll().subscribe(users => this.users = users)
+      }
+  }
 
-  onDeleteUser(): void{
+  onDeleteUser(userToDelete: User): void{
 
     /// i could just use an if but i wanted to remember promises
 
@@ -29,6 +46,7 @@ export class UserComponent {
     const deleteUser = confirm('Do you want to delete the user?')
 
     const confirmRemove = new Promise((resolve, reject) =>
+
     {
       if (deleteUser){
         resolve('Deleted user')
@@ -37,21 +55,16 @@ export class UserComponent {
       else {
         reject(new Error('The user aborted deletion'))
       }
-
-    })
-
-    confirmRemove.then(() => this.EventEmitterDelete.emit(this.user))
+    }
+  )
+  confirmRemove.then(() => {
+    this.SharingData.EventEmitterDeleteUser.emit(userToDelete)})
   }
 
-  onAddUser(): void{
-
-    // this.editingUser = this.editingUser ? false : true
-
-    this.editingUser = !this.editingUser // lol
-    this.EventEmitterEdit.emit(this.editingUser)
-
-
-    this.EventEmitterUpdate.emit(this.user)
-
+  onUpdateUser(userToUpdate: User, editingUser: boolean): void{
+      // this.SharingData.newUserEventEmitter.emit(userToUpdate)
+      this.editingUser = true;
+      this.router.navigate(['/users/update', userToUpdate.id], {state: {userToUpdate, editingUser}})
   }
+
 }

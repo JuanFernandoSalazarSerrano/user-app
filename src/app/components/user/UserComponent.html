@@ -1,3 +1,4 @@
+@for (user of users; track $index) {
 <div class="flex items-start gap-4 bg-slate-50 p-4 rounded-lg border border-slate-100">
   <div class="w-12 h-12 flex items-center justify-center rounded-md bg-indigo-600 text-white font-semibold text-lg">
     {{ (user.name ?? '?').charAt(0) }}{{ (user.lastname ?? '').charAt(0) }}
@@ -17,22 +18,19 @@
     <div class="mt-2 flex items-center justify-between text-sm">
       <div class="text-slate-600">@{{ user.username }}</div>
       <div class="flex gap-2">
+
         <button class="text-blue-600 hover:text-blue-800"
-          (click)="onAddUser()"
-          [routerLink]="['/user/create']">
-          @if(editingUser){
-            Cancel edit
-          }
-          @else{
+          (click)="onUpdateUser(user, this.editingUser)">
           Edit
-          }
         </button>
         <button class="text-red-600 hover:text-red-800"
-          (click)="onDeleteUser()">
+          (click)="onDeleteUser(user)"
+          [routerLink]="['/users']"
+          [state]="{user:user}">
           Delete
         </button>
       </div>
     </div>
   </div>
 </div>
-
+}
