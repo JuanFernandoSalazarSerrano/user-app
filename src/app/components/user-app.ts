@@ -1,8 +1,8 @@
+import { User } from './../models/User';
 import { SharingData } from './../services/sharing-data';
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../services/userService';
-import { User } from '../models/User';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { Navbar } from './navbar/navbar';
 
 @Component({
@@ -18,22 +18,27 @@ export class UserApp implements OnInit {
 
   editingUser: boolean = false;
 
-  userToUpdate!: User;
-
-  constructor(private readonly service: UserService, private SharingData: SharingData){
-
-    this.userToUpdate = new User();
+  constructor(private readonly service: UserService, private SharingData: SharingData, private readonly router: Router){
 
   }
 
   ngOnInit(): void {
     this.service.findAll().subscribe(users => {this.users = users
-    }
-  )
+    })
   // with this i subscribe to the observable
     this.addUser();
     this.onDeleteUser();
+    this.findUserById();
+
   }
+
+  findUserById(){
+    this.SharingData.findUserByIdEventEmitter.subscribe(id => {
+      const user = this.users.find(user => user.id === id)
+
+      this.SharingData.selectedUserEventEmitter.emit(user);
+
+    })}
 
   //updateUser() also.   I dont think this is a good practice
   addUser(): void{
@@ -50,16 +55,7 @@ export class UserApp implements OnInit {
     else{
       this.users = this.users.map(u => u.id === user.id ? { ...u, ...user } : u);
     }
-
-    // reset
-    this.userToUpdate = {
-      id: 0,
-      name: '',
-      lastname: '',
-      username: '',
-      email: '',
-      password: '',
-    };
+    this.router.navigate(['/users'], {state: {users: this.users}})
     })
   }
 
@@ -67,6 +63,7 @@ export class UserApp implements OnInit {
 
     this.SharingData.EventEmitterDeleteUser.subscribe(userToDelete =>{
       this.users = this.users.filter(user => user !== userToDelete)
+      this.router.navigate(['/users/create'], {skipLocationChange: true}).then(() =>{this.router.navigate(['/users'], {state: {users: this.users}})})
     })
   }
 }

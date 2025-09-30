@@ -58,7 +58,8 @@ export class UserComponent {
     }
   )
   confirmRemove.then(() => {
-    this.SharingData.EventEmitterDeleteUser.emit(userToDelete)})
+    this.SharingData.EventEmitterDeleteUser.emit(userToDelete)
+  })
   }
 
   onUpdateUser(userToUpdate: User, editingUser: boolean): void{

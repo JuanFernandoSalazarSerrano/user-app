@@ -6,12 +6,25 @@ import { User } from '../models/User';
 })
 export class SharingData {
 
-    @Output()
     private readonly _newUserEventEmitter: EventEmitter<User> = new EventEmitter();
 
-    @Output()
     private readonly _EventEmitterDeleteUser: EventEmitter<User> = new EventEmitter();
 
+    private readonly _findUserByIdEventEmitter: EventEmitter<number> = new EventEmitter();
+
+    private readonly _selectedUserEventEmitter: EventEmitter<User> = new EventEmitter();
+
+  constructor(){
+
+  }
+
+  public get selectedUserEventEmitter(): EventEmitter<User> {
+    return this._selectedUserEventEmitter;
+  }
+
+  public get findUserByIdEventEmitter(): EventEmitter<number> {
+    return this._findUserByIdEventEmitter;
+  }
 
   public get newUserEventEmitter(): EventEmitter<User> {
     return this._newUserEventEmitter;

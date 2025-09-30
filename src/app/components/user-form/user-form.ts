@@ -1,8 +1,8 @@
 import { SharingData } from './../../services/sharing-data';
-import { Component} from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import { User } from '../../models/User';
-import { Router} from '@angular/router';
+import { ActivatedRoute, Router} from '@angular/router';
 
 
 @Component({
@@ -10,29 +10,36 @@ import { Router} from '@angular/router';
   imports: [FormsModule],
   templateUrl: './user-form.html',
 })
-export class UserForm {
+export class UserForm implements OnInit {
 
   user: User;
 
   editingUser: boolean;
 
-  constructor(private readonly SharingData: SharingData, private readonly router: Router) {
+  constructor(private readonly SharingData: SharingData, private readonly route: ActivatedRoute, private router: Router) {
 
-    if(this.router.currentNavigation()?.extras.state){
-      this.user = this.router.currentNavigation()?.extras.state!['userToUpdate']
-      this.editingUser = true
-    }
+    this.user = new User();
 
-    else {
-        this.user = new User();
-        this.editingUser = false;
+    this.editingUser = false;
+
+  }
+  ngOnInit(): void {
+
+    this.SharingData.selectedUserEventEmitter.subscribe((user) => {
+      this.user = user
+    })
+
+    this.route.paramMap.subscribe(params => {
+      const id: number = +(params.get('id') || '0');
+
+      if (id > 0){
+        this.SharingData.findUserByIdEventEmitter.emit(id);
       }
 
-      console.log(this.user)
+    })
   }
 
   onSubmit(): void {
     this.SharingData.newUserEventEmitter.emit(this.user)
-          this.router.navigate(['/users'])
   }
 }
