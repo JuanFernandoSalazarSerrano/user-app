@@ -1,5 +1,5 @@
 import { Component, Input} from '@angular/core';
-import { RouterModule, RouterOutlet } from '@angular/router';
+import { RouterModule} from '@angular/router';
 import { User } from '../../models/User';
 
 @Component({
@@ -10,5 +10,8 @@ import { User } from '../../models/User';
 export class Navbar {
 
   @Input() users: User[] = []
+
+  constructor(){
+  }
 
 }

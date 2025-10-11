@@ -1,25 +1,35 @@
 import { Injectable } from '@angular/core';
 import { User } from '../models/User';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-  private readonly users: User[] = [
+  private readonly url: string = 'http://localhost:8080/apiV1/users'
 
-  {"id":1,"name":"Alice","lastname":"Gonzalez","email":"alice.g@example.com","username":"aliceg","password":"pass1234"},
-  {"id":2,"name":"Carlos","lastname":"Martinez","email":"carlos.m@example.com","username":"carlosm","password":"password"},
-  {"id":3,"name":"Marta","lastname":"Lopez","email":"marta.l@example.com","username":"martal","password":"123456"},
-  {"id":4,"name":"Diego","lastname":"Perez","email":"diego.p@example.com","username":"diego","password":"qwerty"},
-  {"id":5,"name":"Luisa","lastname":"Rodriguez","email":"luisa.r@example.com","username":"luisar","password":"letmein"}
-
-];
-
-  constructor(){}
+  constructor(private readonly http: HttpClient){}
 
   findAll(): Observable<User[]>{
-    return of(this.users);
+    return this.http.get<User[]>(this.url)
+  }
+
+  findById(id: number): Observable<User>{
+    return this.http.get<User>(`${this.url}/${id}`)
+  }
+
+  create(user: User): Observable<User>{
+    console.log(user)
+    return this.http.post<User>(this.url, user);
+  }
+
+  update(user: User): Observable<User>{
+    return this.http.put<User>(`${this.url}/${user.id}`, user);
+  }
+
+  delete(user: User): Observable<User>{
+    return this.http.delete<User>(`${this.url}/${user.id}`);
   }
 }

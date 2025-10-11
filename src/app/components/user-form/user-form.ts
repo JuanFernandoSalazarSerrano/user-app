@@ -1,8 +1,9 @@
+import { UserService } from './../../services/userService';
 import { SharingData } from './../../services/sharing-data';
 import { Component, OnInit} from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { User } from '../../models/User';
-import { ActivatedRoute, Router} from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -16,7 +17,9 @@ export class UserForm implements OnInit {
 
   editingUser: boolean;
 
-  constructor(private readonly SharingData: SharingData, private readonly route: ActivatedRoute, private router: Router) {
+  constructor(private readonly SharingData: SharingData,
+     private readonly route: ActivatedRoute,
+     private readonly UserService: UserService ) {
 
     this.user = new User();
 
@@ -25,21 +28,36 @@ export class UserForm implements OnInit {
   }
   ngOnInit(): void {
 
-    this.SharingData.selectedUserEventEmitter.subscribe((user) => {
+        this.SharingData.selectedUserEventEmitter.subscribe((user) => {
       this.user = user
     })
+
+
 
     this.route.paramMap.subscribe(params => {
       const id: number = +(params.get('id') || '0');
 
       if (id > 0){
         this.SharingData.findUserByIdEventEmitter.emit(id);
-      }
 
-    })
+        this.UserService.findById(id).subscribe(user => this.user = user);
+        this.editingUser = !this.editingUser
+      }
+    });
   }
 
   onSubmit(): void {
-    this.SharingData.newUserEventEmitter.emit(this.user)
+
+  if (this.editingUser) {
+    // Update existing user
+    this.SharingData.newUserEventEmitter.emit(this.user);
+  } else {
+    // Create new user (no id)
+    const { id, ...userWithoutId } = this.user;
+    this.SharingData.newUserEventEmitter.emit(userWithoutId as User);
+  }
+
+    //If you are creating a new user, you should not set a fixed ID.
+    // The backend should assign the ID.
   }
 }
