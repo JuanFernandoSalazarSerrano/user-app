@@ -17,6 +17,8 @@ export class UserForm implements OnInit {
 
   editingUser: boolean;
 
+  errors: any = {email:''};
+
   constructor(private readonly SharingData: SharingData,
      private readonly route: ActivatedRoute,
      private readonly UserService: UserService ) {
@@ -28,11 +30,14 @@ export class UserForm implements OnInit {
   }
   ngOnInit(): void {
 
-        this.SharingData.selectedUserEventEmitter.subscribe((user) => {
-      this.user = user
+    this.SharingData.errorsFormEventEmitter.subscribe((errors) => {
+      this.errors = errors
+      console.log(this.errors)
     })
 
-
+    this.SharingData.selectedUserEventEmitter.subscribe((user) => {
+      this.user = user
+    })
 
     this.route.paramMap.subscribe(params => {
       const id: number = +(params.get('id') || '0');

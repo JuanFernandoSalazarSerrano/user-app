@@ -14,8 +14,13 @@ export class SharingData {
 
     private readonly _selectedUserEventEmitter: EventEmitter<User> = new EventEmitter();
 
-  constructor(){
+    private readonly _errorsFormEventEmitter: EventEmitter<any> = new EventEmitter();
 
+
+  constructor(){}
+
+  public get errorsFormEventEmitter(): EventEmitter<any> {
+    return this._errorsFormEventEmitter;
   }
 
   public get selectedUserEventEmitter(): EventEmitter<User> {

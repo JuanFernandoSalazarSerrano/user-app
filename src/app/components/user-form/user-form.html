@@ -34,8 +34,15 @@
   </div>
 
   <!-- Email -->
+
+
+
   <div>
     <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+
+      @if (errors?.email) {
+    <div class="bg-indigo-500 rounded-full px-2 text-white">{{errors.email + '!'}}</div>
+  }
     <input
       type="email"
       name="email"

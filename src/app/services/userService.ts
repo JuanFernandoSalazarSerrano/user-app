@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class UserService {
 
-  private readonly url: string = 'http://localhost:8080/apiV1/users'
+  private readonly url: string = 'http://localhost:8080/api/v1/users'
 
   constructor(private readonly http: HttpClient){}
 
@@ -21,7 +21,6 @@ export class UserService {
   }
 
   create(user: User): Observable<User>{
-    console.log(user)
     return this.http.post<User>(this.url, user);
   }
 
