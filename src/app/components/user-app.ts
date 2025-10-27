@@ -2,7 +2,7 @@ import { User } from './../models/User';
 import { SharingData } from './../services/sharing-data';
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../services/userService';
-import { Router, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { Navbar } from './navbar/navbar';
 
 @Component({
@@ -21,17 +21,33 @@ export class UserApp implements OnInit {
   constructor(
     private readonly service: UserService,
     private readonly SharingData: SharingData,
-    private readonly router: Router){
+    private readonly router: Router,
+    private readonly route: ActivatedRoute){
 
   }
 
   ngOnInit(): void {
-    // only run the back query the first time, then, work with the state
+
+    this.route.paramMap.subscribe(params => {
+      const page = +(params.get('page') || 0); // paramMap is an Observable that emits a ParamMap whenever route path parameters change.
+                                               // params.get('page') returns the string value of the "page" parameter (or null) + converts the value to int.
+
     if (this.users === null || this.users === undefined || this.users.length === 0){
-    this.service.findAll().subscribe(users => {this.users = users
+    this.service.findAllPageable(page).subscribe(users => {this.users = users
       // im sorry, i just dont know any better
       this.router.navigate(['/users/create'], {skipLocationChange: true}).then(() =>{this.router.navigate(['/users'], {state: {users: this.users}})})
     })}
+})
+
+    // only run the back query the first time, then, work with the state
+
+    // if (this.users === null || this.users === undefined || this.users.length === 0){
+    // this.service.findAll().subscribe(users => {this.users = users
+    //   // im sorry, i just dont know any better
+    //   this.router.navigate(['/users/create'], {skipLocationChange: true}).then(() =>{this.router.navigate(['/users'], {state: {users: this.users}})})
+    // })}
+
+
 
   // with this i subscribe to the observable
     this.addUser();
