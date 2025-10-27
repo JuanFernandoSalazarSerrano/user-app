@@ -1,7 +1,7 @@
 import { SharingData } from './../../services/sharing-data';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, signal } from '@angular/core';
 import { User } from '../../models/User';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { UserService } from '../../services/userService';
 
 @Component({
@@ -9,15 +9,17 @@ import { UserService } from '../../services/userService';
   imports: [RouterModule],
   templateUrl: './UserComponent.html'
 })
-export class UserComponent {
+export class UserComponent implements OnInit {
 
   user: User;
 
-  users: User[] = []
+  users = signal<User[]>([]);
 
   editingUser: boolean = false;
 
-  constructor(private router: Router, private service: UserService, private readonly SharingData: SharingData){
+  constructor(private router: Router, private service: UserService, private readonly SharingData: SharingData,
+    private readonly route: ActivatedRoute
+  ){
 
     this.user = {
       id: 0,
@@ -28,13 +30,22 @@ export class UserComponent {
       password: ''
     };
 
-    if(this.router.currentNavigation()?.extras.state){
-      this.users = this.router.currentNavigation()?.extras.state!['users']
-    }
 
-    else {
-      this.service.findAll().subscribe(users => this.users = users)
-      }
+  }
+  ngOnInit(): void {
+
+    this.route.paramMap.subscribe(params => {
+
+      const page = +(params.get('page') || 0);
+
+
+          this.service.findAllPageable(page).subscribe(pageable => {
+            this.users.set(pageable.content)
+            console.log(this.users(), 'a'); // <-- correct way to see the array
+            })
+
+  }
+)
   }
 
   onDeleteUser(userToDelete: User): void{

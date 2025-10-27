@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'app-paginator-button',
+  selector: 'paginator-button',
   imports: [],
   templateUrl: './paginator-button.html',
 })
 export class PaginatorButton {
+
+  @Input() pageNumber!: Number;
 
 }

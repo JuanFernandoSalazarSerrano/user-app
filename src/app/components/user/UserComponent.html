@@ -1,4 +1,4 @@
-@for (user of users; track $index) {
+@for (user of users(); track $index) {
 <div class="flex items-start gap-4 bg-slate-50 p-4 rounded-lg border border-slate-100">
   <div class="w-12 h-12 flex items-center justify-center rounded-md bg-indigo-600 text-white font-semibold text-lg">
     {{ (user.name ?? '?').charAt(0) }}{{ (user.lastname ?? '').charAt(0) }}

@@ -1,16 +1,29 @@
 <!-- Minimal User List (Tailwind) — uses @if and @for (no deprecated directives) -->
 
 <navbar
-  [users]="users"
+  [users]="users()"
 ></navbar>
 
 <div class="max-w-5xl mx-auto mt-8 p-6 bg-white rounded-xl shadow">
   <header class="flex items-center justify-between mb-6">
-    <h2 class="text-xl font-semibold text-slate-800">Users</h2>
+    <h2 class="text-xl font-semibold text-slate-800">{{title()}}!</h2>
     <p class="text-sm text-slate-500">{{ (users).length }} users Active</p>
   </header>
 
     <router-outlet/>
+
+    <div class="flex items-center justify-center">
+
+      @for (pages of [].constructor(totalNumberOfPages); track $index) {
+
+        <paginator-button
+        [routerLink]="[`/users/page/${$index}`]"
+        [pageNumber]="$index"
+        ></paginator-button>
+
+      }
+
+    </div>
 
 </div>
 

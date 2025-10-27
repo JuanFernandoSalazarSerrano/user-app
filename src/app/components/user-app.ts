@@ -1,20 +1,23 @@
 import { User } from './../models/User';
 import { SharingData } from './../services/sharing-data';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { UserService } from '../services/userService';
-import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterOutlet, RouterLinkWithHref, RouterModule} from '@angular/router';
 import { Navbar } from './navbar/navbar';
+import { PaginatorButton } from './paginator-button/paginator-button';
 
 @Component({
   selector: 'user-app',
-  imports: [RouterOutlet, Navbar],
+  imports: [RouterOutlet, Navbar, PaginatorButton, RouterLinkWithHref, RouterModule],
   templateUrl: './user-app.html'})
 
 export class UserApp implements OnInit {
 
-  title!: string;
+  totalNumberOfPages!: number;
 
-  users: User[] = [];
+  title = signal('Users')
+
+  users = signal<User[]>([]);
 
   editingUser: boolean = false;
 
@@ -28,16 +31,21 @@ export class UserApp implements OnInit {
 
   ngOnInit(): void {
 
-    this.route.paramMap.subscribe(params => {
-      const page = +(params.get('page') || 0); // paramMap is an Observable that emits a ParamMap whenever route path parameters change.
-                                               // params.get('page') returns the string value of the "page" parameter (or null) + converts the value to int.
+    this.route.paramMap.subscribe(_ => {
 
-    if (this.users === null || this.users === undefined || this.users.length === 0){
-    this.service.findAllPageable(page).subscribe(users => {this.users = users
-      // im sorry, i just dont know any better
-      this.router.navigate(['/users/create'], {skipLocationChange: true}).then(() =>{this.router.navigate(['/users'], {state: {users: this.users}})})
-    })}
-})
+
+      if (this.users === null || this.users === undefined || this.users.length === 0)
+
+        {
+
+          this.service.findAllPageable(0).subscribe(pageable => {
+            this.title.set('Users')
+            this.users.set(pageable.content)
+            console.log(this.users(), 'a'); // <-- correct way to see the array
+            this.totalNumberOfPages = pageable.totalPages})
+    }
+  }
+)
 
     // only run the back query the first time, then, work with the state
 
@@ -58,7 +66,7 @@ export class UserApp implements OnInit {
   findUserById(){
     this.SharingData.findUserByIdEventEmitter.subscribe(id => {
 
-      const user = this.users.find(user => user.id === id)
+      const user = this.users().find(user => user.id === id)
 
       this.SharingData.selectedUserEventEmitter.emit(user);
 
@@ -76,10 +84,10 @@ export class UserApp implements OnInit {
 
       {next: (userCreated) => {
 
-      if (this.users.some(usersInTheArray => userCreated.id === usersInTheArray.id) === undefined)
+      if (this.users().some(usersInTheArray => userCreated.id === usersInTheArray.id) === undefined)
 
         {
-          this.users.push(userCreated)
+          this.users().push(userCreated)
           this.router.navigate(['/users'], {state: {users: this.users}})
         }
         // but if the user was found, just update
@@ -88,7 +96,7 @@ export class UserApp implements OnInit {
 
       this.service.update(user).subscribe(
         userUpdated => {
-          this.users = this.users.map(u => u.id === userUpdated.id ? { ...u, ...userUpdated } : u);
+          this.users().map(u => u.id === userUpdated.id ? { ...u, ...userUpdated } : u);
           this.router.navigate(['/users'], {state: {users: this.users}
 
                 }
@@ -107,7 +115,7 @@ export class UserApp implements OnInit {
 onDeleteUser(): void{
 
   this.SharingData.EventEmitterDeleteUser.subscribe(userToDelete =>{
-    this.users = this.users.filter(user => user !== userToDelete)
+    this.users().filter(user => user !== userToDelete)
     this.router.navigate(['/users/create'], {skipLocationChange: true}).then(() =>{this.router.navigate(['/users'], {state: {users: this.users}})})
       this.service.delete(userToDelete).subscribe(userToDelete =>{
         }
