@@ -3,12 +3,12 @@ import { SharingData } from './../../services/sharing-data';
 import { Component, OnInit} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { User } from '../../models/User';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 
 @Component({
   selector: 'user-form',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './user-form.html',
 })
 export class UserForm implements OnInit {
@@ -54,9 +54,13 @@ export class UserForm implements OnInit {
   onSubmit(): void {
 
   if (this.editingUser) {
+          console.log('asasadafassasasa90')
+
     // Update existing user
     this.SharingData.newUserEventEmitter.emit(this.user);
   } else {
+          console.log('asasadafassasasa91')
+
     // Create new user (no id)
     const { id, ...userWithoutId } = this.user;
     this.SharingData.newUserEventEmitter.emit(userWithoutId as User);

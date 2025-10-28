@@ -9,13 +9,14 @@ import { PaginatorButton } from './paginator-button/paginator-button';
 @Component({
   selector: 'user-app',
   imports: [RouterOutlet, Navbar, PaginatorButton, RouterLinkWithHref, RouterModule],
-  templateUrl: './user-app.html'})
+  templateUrl: './user-app.html'
+})
 
 export class UserApp implements OnInit {
 
   totalNumberOfPages!: number;
 
-  title = signal('Users')
+  title = signal<string>('Users')
 
   users = signal<User[]>([]);
 
@@ -25,14 +26,14 @@ export class UserApp implements OnInit {
     private readonly service: UserService,
     private readonly SharingData: SharingData,
     private readonly router: Router,
-    private readonly route: ActivatedRoute){
+    private readonly route: ActivatedRoute
+  ){
 
   }
 
   ngOnInit(): void {
 
     this.route.paramMap.subscribe(_ => {
-
 
       if (this.users === null || this.users === undefined || this.users.length === 0)
 
@@ -41,26 +42,15 @@ export class UserApp implements OnInit {
           this.service.findAllPageable(0).subscribe(pageable => {
             this.title.set('Users')
             this.users.set(pageable.content)
-            console.log(this.users(), 'a'); // <-- correct way to see the array
             this.totalNumberOfPages = pageable.totalPages})
-    }
-  }
-)
+        }
+    })
 
-    // only run the back query the first time, then, work with the state
-
-    // if (this.users === null || this.users === undefined || this.users.length === 0){
-    // this.service.findAll().subscribe(users => {this.users = users
-    //   // im sorry, i just dont know any better
-    //   this.router.navigate(['/users/create'], {skipLocationChange: true}).then(() =>{this.router.navigate(['/users'], {state: {users: this.users}})})
-    // })}
-
-
-
-  // with this i subscribe to the observable
+    // with this i subscribe to the observable
     this.addUser();
     this.onDeleteUser();
     this.findUserById();
+
   }
 
   findUserById(){
@@ -70,57 +60,53 @@ export class UserApp implements OnInit {
 
       this.SharingData.selectedUserEventEmitter.emit(user);
 
-    })}
+    })
+  }
 
-  addUser(): void{
+  addUser(): void {
 
     this.SharingData.newUserEventEmitter.subscribe(user => {
 
-    this.editingUser = false
+      this.editingUser = false;
 
-    // If the user was not found then, its new. Add it to the list and increase its identifier by 1
+      // If the user was not found, it's new. Add it to the list.
+      this.service.create(user).subscribe({
 
-    this.service.create(user).subscribe(
+        next: (userCreated) => {
+          if (this.users().find(u => u.id === userCreated.id) === undefined) {
+            this.users().push(userCreated);
+            this.router.navigate(['/users'], { state: { users: this.users() } })
 
-      {next: (userCreated) => {
+          } else {
+            // If the user was found, update it instead
+            this.service.update(user).subscribe(userUpdated => {
+          console.log('asasadafas23')
 
-      if (this.users().some(usersInTheArray => userCreated.id === usersInTheArray.id) === undefined)
+              this.users().map(u =>
+                u.id === userUpdated.id ? { ...u, ...userUpdated } : u
+              );
+              this.router.navigate(['/users'], { state: { users: this.users() } })
 
-        {
-          this.users().push(userCreated)
-          this.router.navigate(['/users'], {state: {users: this.users}})
-        }
-        // but if the user was found, just update
 
-    else{
+            });
+          }
+        },
+        error: (err) => {
+          this.SharingData.errorsFormEventEmitter.emit(err.error);
+        },
+      });
+                this.router.navigate(['/users'], { state: { users: this.users() } });
 
-      this.service.update(user).subscribe(
-        userUpdated => {
-          this.users().map(u => u.id === userUpdated.id ? { ...u, ...userUpdated } : u);
-          this.router.navigate(['/users'], {state: {users: this.users}
+    });
+  }
 
-                }
-              )
-            }
-          )
-        }
-      },error: (err) => {this.SharingData.errorsFormEventEmitter.emit(err.error)}}
-
-      )
-    }
-  )
+  onDeleteUser(): void {
+    this.SharingData.EventEmitterDeleteUser.subscribe(userToDelete => {
+      this.service.delete(userToDelete).subscribe(() => {
+        this.users.set(this.users().filter(user => user !== userToDelete));
+        this.router.navigate(['/users'], { state: { users: this.users() } });
+      });
+    });
+  }
 }
 
-
-onDeleteUser(): void{
-
-  this.SharingData.EventEmitterDeleteUser.subscribe(userToDelete =>{
-    this.users().filter(user => user !== userToDelete)
-    this.router.navigate(['/users/create'], {skipLocationChange: true}).then(() =>{this.router.navigate(['/users'], {state: {users: this.users}})})
-      this.service.delete(userToDelete).subscribe(userToDelete =>{
-        }
-      )
-    }
-  )
-}
-}

@@ -1,5 +1,5 @@
 import { SharingData } from './../../services/sharing-data';
-import { Component, Input, Output, EventEmitter, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { User } from '../../models/User';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { UserService } from '../../services/userService';
@@ -41,7 +41,6 @@ export class UserComponent implements OnInit {
 
           this.service.findAllPageable(page).subscribe(pageable => {
             this.users.set(pageable.content)
-            console.log(this.users(), 'a'); // <-- correct way to see the array
             })
 
   }
@@ -50,9 +49,7 @@ export class UserComponent implements OnInit {
 
   onDeleteUser(userToDelete: User): void{
 
-    /// i could just use an if but i wanted to remember promises
-
-    /// TODO add sweetalert or somehting better
+    console.log(userToDelete)
 
     const deleteUser = confirm('Do you want to delete the user?')
 
@@ -69,6 +66,7 @@ export class UserComponent implements OnInit {
     }
   )
   confirmRemove.then(() => {
+    console.log(userToDelete,'c')
     this.SharingData.EventEmitterDeleteUser.emit(userToDelete)
   })
   }
